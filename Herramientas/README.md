@@ -45,3 +45,19 @@ https://www.zaproxy.org/
 https://portswigger.net/burp/communitydownload
 
 https://caido.io/
+
+## pastebin
+
+https://pastebin.com/
+
+
+## Extensiones
+
+Hack-Tools 
+
+HackBar 
+
+Hunter Search  
+
+OWASP Penetration Testing Kit
+
