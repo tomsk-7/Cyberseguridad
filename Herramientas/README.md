@@ -6,6 +6,10 @@ https://intelx.io/
 
 https://grep.app/
 
+## Shodan 
+
+https://www.shodan.io/
+
 ## Google dorks bsuqeda avanzada OSINT
 
 https://dorksearch.com/
