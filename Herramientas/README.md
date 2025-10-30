@@ -37,3 +37,11 @@ https://www.cvedetails.com/
 https://nvd.nist.gov/vuln/search#/nvd/home?resultType=records
 
 https://vulners.com/
+
+## Audfit websites
+
+https://www.zaproxy.org/
+
+https://portswigger.net/burp/communitydownload
+
+https://caido.io/
