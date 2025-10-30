@@ -10,3 +10,11 @@ https://portswigger.net/web-security
  - [caido](https://caido.io/download)
  - [dorksearch](https://dorksearch.com/)
  - [cve](https://www.cve.org/)
+
+ ## Testing
+
+ http://www.vulnerabledomain.org/
+
+ http://testphp.vulnweb.com/search.php?test=query
+
+ https://public-firing-range.appspot.com/
