@@ -18,6 +18,8 @@ https://www.ssllabs.com/ssltest/
 
 https://dnsdumpster.com/
 
+https://pentest-tools.com/
+
 ## Online server protocols and services detection
 
 https://www.shodan.io/
