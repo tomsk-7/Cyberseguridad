@@ -52,7 +52,7 @@ https://nvd.nist.gov/vuln/search#/nvd/home?resultType=records
 
 https://vulners.com/
 
-## Audfit websites
+## Audit  websites
 
 https://www.zaproxy.org/
 
