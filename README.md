@@ -4,6 +4,8 @@ Cositas
 ## ACADEMIAS GRATUITAS
 https://portswigger.net/web-security
 
+https://hacksplaining.com/lessons
+
 
 ## HERRAMIENTAS
  - [burp](https://portswigger.net/burp/communitydownload)
