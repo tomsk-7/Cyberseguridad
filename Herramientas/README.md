@@ -71,3 +71,6 @@ Hunter Search
 
 OWASP Penetration Testing Kit
 
+Wappalyzer - Technology profiler
+
+
