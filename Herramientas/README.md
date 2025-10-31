@@ -24,7 +24,7 @@ https://www.shodan.io/
 
 https://search.censys.io/
 
-## Google dorks bsuqeda avanzada OSINT
+## Google dorks  OSINT
 
 https://dorksearch.com/
 
