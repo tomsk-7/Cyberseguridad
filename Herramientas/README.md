@@ -62,6 +62,8 @@ https://portswigger.net/burp/communitydownload
 
 https://caido.io/
 
+https://www.xss-scanner.com/ 
+
 ## pastebin
 
 https://pastebin.com/
@@ -78,5 +80,17 @@ Hunter Search
 OWASP Penetration Testing Kit
 
 Wappalyzer - Technology profiler
+
+## Github tools
+
+### XSS
+
+https://wapiti-scanner.github.io/
+
+https://github.com/hahwul/dalfox
+
+https://github.com/s0md3v/XSStrike
+
+
 
 
