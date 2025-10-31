@@ -24,6 +24,10 @@ https://www.shodan.io/
 
 https://search.censys.io/
 
+https://www.criminalip.io/
+
+https://search.onyphe.io/
+
 ## Google dorks  OSINT
 
 https://dorksearch.com/
