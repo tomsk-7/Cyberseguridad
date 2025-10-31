@@ -91,6 +91,8 @@ https://github.com/hahwul/dalfox
 
 https://github.com/s0md3v/XSStrike
 
+https://github.com/menkrep1337/XSSCon
+
 
 
 
