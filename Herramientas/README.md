@@ -18,17 +18,15 @@ https://www.ssllabs.com/ssltest/
 
 https://dnsdumpster.com/
 
-## Shodan 
+## Online server protocols and services detection
 
 https://www.shodan.io/
+
+https://search.censys.io/
 
 ## Google dorks bsuqeda avanzada OSINT
 
 https://dorksearch.com/
-
-## Monitorizacion
-
-https://search.censys.io/
 
 ## Mapa de redes inalambricas
 
