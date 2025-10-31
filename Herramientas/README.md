@@ -6,6 +6,18 @@ https://intelx.io/
 
 https://grep.app/
 
+## Analyzers (ssl, headers, website, dns)
+
+https://securityheaders.com/
+
+https://developer.mozilla.org/en-US/observatory
+
+https://pagespeed.web.dev/
+
+https://www.ssllabs.com/ssltest/
+
+https://dnsdumpster.com/
+
 ## Shodan 
 
 https://www.shodan.io/
