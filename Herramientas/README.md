@@ -34,6 +34,8 @@ https://search.onyphe.io/
 
 https://dorksearch.com/
 
+https://www.exploit-db.com/google-hacking-database
+
 ## Mapa de redes inalambricas
 
 https://wigle.net/index
