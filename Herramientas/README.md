@@ -32,7 +32,9 @@ https://www.criminalip.io/
 
 https://search.onyphe.io/
 
-## Google dorks  OSINT
+## Google dorks  & OSINT
+
+maletgo
 
 https://dorksearch.com/
 
