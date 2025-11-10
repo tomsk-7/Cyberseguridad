@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía de Seguridad del Servidor Linux (FTP + Web + Firewall)</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 40px;
+      background-color: #f9f9f9;
+      color: #222;
+      line-height: 1.6;
+    }
+    h1, h2, h3 {
+      color: #004d99;
+    }
+    pre, code {
+      background: #f4f4f4;
+      border: 1px solid #ddd;
+      padding: 8px;
+      border-radius: 4px;
+      font-family: "Courier New", monospace;
+      display: block;
+      overflow-x: auto;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background: #004d99;
+      color: #fff;
+      text-align: left;
+    }
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+    blockquote {
+      background: #eef;
+      border-left: 5px solid #004d99;
+      margin: 10px 0;
+      padding: 10px 15px;
+    }
+    .footer {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 40px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🛡️ Guía de Seguridad para Servidor Linux (FTP + Web + Firewall)</h1>
+
+<h2>📘 Índice</h2>
+<ol>
+  <li>Configuración base de seguridad</li>
+  <li>Evitar descubrimiento de puertos con Nmap</li>
+  <li>Reglas iptables recomendadas</li>
+  <li>Configuración segura de vsftpd (FTP)</li>
+  <li>Encapsular (chroot) usuarios FTP</li>
+  <li>Evitar subida de código malicioso</li>
+  <li>Gestión de permisos y sudo</li>
+  <li>Recomendaciones finales</li>
+</ol>
+
+<hr>
+
+<h2 id="configuración-base-de-seguridad">⚙️ Configuración base de seguridad</h2>
+<pre><code>sudo apt update && sudo apt upgrade -y
+</code></pre>
+<ul>
+  <li>Usa contraseñas robustas o autenticación por clave SSH.</li>
+  <li>Deshabilita acceso SSH al usuario root:</li>
+</ul>
+<pre><code>PermitRootLogin no
+</code></pre>
+<ul>
+  <li>Instala herramientas de defensa como <strong>fail2ban</strong> o <strong>psad</strong>.</li>
+</ul>
+
+<hr>
+
+<h2 id="evitar-descubrimiento-de-puertos-con-nmap">🔍 Evitar descubrimiento de puertos con Nmap</h2>
+
+<p>Nmap usa distintos tipos de paquetes para detectar servicios:</p>
+
+<table>
+  <tr><th>Tipo de escaneo</th><th>Paquetes enviados</th><th>Qué bloquear</th></tr>
+  <tr><td>SYN scan (-sS)</td><td>Paquetes SYN</td><td>Rate-limit SYN</td></tr>
+  <tr><td>Connect scan (-sT)</td><td>TCP completo</td><td>Permisos de aplicación</td></tr>
+  <tr><td>FIN/NULL/XMAS</td><td>Flags anómalos</td><td>Reglas TCP flags</td></tr>
+  <tr><td>UDP scan (-sU)</td><td>UDP vacíos</td><td>Rate-limit UDP</td></tr>
+  <tr><td>Ping sweep (-sn)</td><td>ICMP</td><td>Bloquear ICMP echo</td></tr>
+  <tr><td>Version/OS detect</td><td>Múltiples probes</td><td>Ocultar banners / fingerprints</td></tr>
+</table>
+
+<hr>
+
+<h2 id="reglas-iptables-recomendadas">🔥 Reglas iptables recomendadas</h2>
+
+<pre><code># Política base
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT ACCEPT
+
+# Conexiones establecidas y localhost
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+
+# Permitir puertos HTTP, HTTPS y FTP
+iptables -A INPUT -p tcp -m multiport --dports 21,80,443 -j ACCEPT
+
+# Bloquear ICMP
+iptables -A INPUT -p icmp --icmp-type echo-request -j DROP
+
+# Bloquear scans
+iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+iptables -A INPUT -p tcp --tcp-flags ALL FIN -j DROP
+iptables -A INPUT -p tcp --tcp-flags ALL FIN,PSH,URG -j DROP
+iptables -A INPUT -p tcp --tcp-flags ACK ACK -m conntrack --ctstate NEW -j DROP
+
+# Limitar SYN floods
+iptables -A INPUT -p tcp --syn -m limit --limit 10/s --limit-burst 20 -j ACCEPT
+iptables -A INPUT -p tcp --syn -j DROP
+
+# FTP pasivo
+iptables -A INPUT -p tcp --dport 50000:51000 -j ACCEPT
+
+# Log y drop
+iptables -A INPUT -j LOG --log-prefix "DROP INPUT: "
+iptables -A INPUT -j DROP
+</code></pre>
+
+<hr>
+
+<h2 id="configuración-segura-de-vsftpd-ftp">📂 Configuración segura de vsftpd (FTP)</h2>
+
+<pre><code>sudo apt install vsftpd
+sudo systemctl enable vsftpd --now
+</code></pre>
+
+<pre><code>local_enable=YES
+write_enable=YES
+chroot_local_user=YES
+allow_writeable_chroot=YES
+
+pasv_enable=YES
+pasv_min_port=50000
+pasv_max_port=51000
+
+local_root=/srv/ftp/$USER
+ftpd_banner=FTP Service Ready.
+
+ssl_enable=YES
+rsa_cert_file=/etc/ssl/certs/vsftpd.pem
+rsa_private_key_file=/etc/ssl/private/vsftpd.key
+</code></pre>
+
+<hr>
+
+<h2 id="encapsular-chroot-usuarios-ftp">🧱 Encapsular (chroot) usuarios FTP</h2>
+
+<pre><code>sudo mkdir -p /srv/ftp/usuarioftp
+sudo adduser usuarioftp --home /srv/ftp/usuarioftp --shell /usr/sbin/nologin
+sudo passwd usuarioftp
+sudo chown root:root /srv/ftp/usuarioftp
+sudo chmod 755 /srv/ftp/usuarioftp
+sudo mkdir /srv/ftp/usuarioftp/files
+sudo chown usuarioftp:usuarioftp /srv/ftp/usuarioftp/files
+sudo systemctl restart vsftpd
+</code></pre>
+
+<hr>
+
+<h2 id="evitar-subida-de-código-malicioso">🧹 Evitar subida de código malicioso</h2>
+
+<h3>1️⃣ Restringir permisos</h3>
+<pre><code>chmod -R 644 /srv/ftp/usuarioftp/files
+find /srv/ftp/usuarioftp/files -type d -exec chmod 755 {} \;
+</code></pre>
+
+<h3>2️⃣ Filtro de extensiones con inotify</h3>
+<pre><code>sudo apt install inotify-tools
+
+cat << 'EOF' | sudo tee /usr/local/bin/ftp-watchdog.sh
+#!/bin/bash
+WATCH_DIR="/srv/ftp/usuarioftp/files"
+inotifywait -m -e create -e moved_to "$WATCH_DIR" |
+while read path action file; do
+  if [[ "$file" =~ \.(php|pl|py|sh|cgi|exe|js)$ ]]; then
+    echo "$(date): Archivo sospechoso eliminado: $file" >> /var/log/ftp-watchdog.log
+    rm -f "$path$file"
+  fi
+done
+EOF
+
+sudo chmod +x /usr/local/bin/ftp-watchdog.sh
+sudo nohup /usr/local/bin/ftp-watchdog.sh &
+</code></pre>
+
+<h3>3️⃣ Escaneo antivirus automático</h3>
+<pre><code>sudo apt install clamav clamav-daemon
+sudo freshclam
+
+cat << 'EOF' | sudo tee /usr/local/bin/ftp-avscan.sh
+#!/bin/bash
+WATCH_DIR="/srv/ftp/usuarioftp/files"
+inotifywait -m -e close_write,moved_to "$WATCH_DIR" |
+while read path action file; do
+  clamscan --move=/srv/ftp/quarantine "$path$file"
+done
+EOF
+
+sudo chmod +x /usr/local/bin/ftp-avscan.sh
+sudo nohup /usr/local/bin/ftp-avscan.sh &
+</code></pre>
+
+<hr>
+
+<h2 id="gestión-de-permisos-y-sudo">⚙️ Gestión de permisos y sudo</h2>
+
+<p>El binario <code>sudo</code> tiene permiso <strong>4755</strong> (setuid). Quitar el bit desactiva <code>sudo</code> para usuarios normales.</p>
+
+<blockquote>⚠️ No recomendado salvo que tengas acceso root alternativo.</blockquote>
+
+<pre><code># Quitar setuid (no recomendado)
+chmod 0755 /usr/bin/sudo
+
+# Restaurar
+chmod 4755 /usr/bin/sudo
+</code></pre>
+
+<h3>Alternativas seguras</h3>
+<ul>
+  <li>Limitar comandos en <code>/etc/sudoers</code>:</li>
+</ul>
+<pre><code>usuarioftp ALL=(root) /bin/systemctl restart nginx.service
+</code></pre>
+<ul>
+  <li>Eliminar usuarios del grupo sudo:</li>
+</ul>
+<pre><code>sudo deluser usuarioftp sudo
+</code></pre>
+<ul>
+  <li>Activar logs:</li>
+</ul>
+<pre><code>Defaults logfile="/var/log/sudo.log"
+</code></pre>
+
+<hr>
+
+<h2 id="recomendaciones-finales">✅ Recomendaciones finales</h2>
+
+<ul>
+  <li>Aplica principio de mínimo privilegio.</li>
+  <li>Usa FTPS o SFTP (no FTP sin cifrar).</li>
+  <li>Revisa logs periódicamente:</li>
+</ul>
+<pre><code>sudo grep "STOR" /var/log/vsftpd.log
+sudo grep "sudo" /var/log/auth.log
+</code></pre>
+<ul>
+  <li>Usa IDS (psad, OSSEC, Linux Malware Detect).</li>
+  <li>Mantén el sistema siempre actualizado.</li>
+</ul>
+
+<div class="footer">
+  📄 <strong>Autor:</strong> Administrador de sistemas<br>
+  🗓️ <strong>Última revisión:</strong> Noviembre 2025<br>
+  🔐 <strong>Propósito:</strong> Guía práctica de endurecimiento para servidores FTP y web Linux.
+</div>
+
+</body>
+</html>
