@@ -6,6 +6,8 @@ https://portswigger.net/web-security
 
 https://hacksplaining.com/lessons
 
+https://rix4uni.notion.site/KrazePlanetTraining-26c431384fa0804e9099ea445a3e2be0?source=copy_link
+
 
 ## HERRAMIENTAS
  - [burp](https://portswigger.net/burp/communitydownload)
