@@ -8,6 +8,7 @@ https://hacksplaining.com/lessons
 
 https://rix4uni.notion.site/KrazePlanetTraining-26c431384fa0804e9099ea445a3e2be0?source=copy_link
 
+https://rix4uni.notion.site/KrazePlanetTraining-26c431384fa0804e9099ea445a3e2be0
 
 ## HERRAMIENTAS
  - [burp](https://portswigger.net/burp/communitydownload)
